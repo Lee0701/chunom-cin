@@ -1,0 +1,4 @@
+%ename Chu-Nom:en;𡨸喃:vi;
+%cname 𡨸喃
+#sname 𡨸喃
+%selkey 1234567890
