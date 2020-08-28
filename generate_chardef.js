@@ -1,13 +1,17 @@
 
+const fs = require('fs')
 const readline = require('readline')
 const reader = readline.createInterface({input: process.stdin})
 
+const loadKeymap = (path) => fs.readFileSync(path).toString().split('\n')
+        .map((line) => line.split(' '))
+        .filter((entry) => entry.length >= 2)
+        .reduce((a, [v, k]) => (a[k] = a[k] || v, a), {})
+
 const KEYMAPS = {
-    'vni': require('./keymap/vni.json'),
-    'telex': require('./keymap/telex.json'),
+    'vni': loadKeymap('./keymap/keymap_vni.txt'),
+    'telex': loadKeymap('./keymap/keymap_telex.txt'),
 }
-const CHARDEF_BEGIN = '%chardef begin'
-const CHARDEF_END = '%chardef end'
 
 const args = process.argv.slice(2)
 const keymapName = args.pop()
@@ -23,17 +27,6 @@ reader.on('close', () => {
 })
 
 const generateChardef = (data, keymap) => {
-    const keySeq = (s) => s.split('').map(c => keymap.charToKeySeq[c] || c).join('')
-    const result = []
-    result.push(CHARDEF_BEGIN)
-    result.push(generateKeymapChardef(keymap))
-    result.push(data.map(([key, value]) => `${keySeq(key)}\t${value}`).join('\n'))
-    result.push(CHARDEF_END)
-    return result.join('\n')
-}
-
-const generateKeymapChardef = (keymap) => {
-    return Object.entries(keymap.keySeqToChar)
-            .map(([keySeq, char]) => `${keySeq}\t${char}`)
-            .join('\n')
+    const keySeq = (s) => s.split('').map(c => keymap[c] || c).join('')
+    return data.map(([key, value]) => `${keySeq(key)} ${value}`).join('\n')
 }

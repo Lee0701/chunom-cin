@@ -15,6 +15,7 @@ reader.on('close', () => {
 const convertDict = (dict) => {
     return dict.split('|')
             .map((entry) => entry.split(':'))
-            .map(([key, value]) => value.split(',').map((v) => [key, v]))
+            .filter((entry) => entry.length >= 2)
+            .map(([key, value]) => value.split(',').map((v) => [key.toLowerCase(), v]))
             .flat()
 }
